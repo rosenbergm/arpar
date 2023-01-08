@@ -1,19 +1,19 @@
 use std::collections::HashMap;
 use std::env;
-use std::io::{self, Write};
 
-// use termion::color;
-// use termion::event::Key;
-// use termion::input::TermRead;
-// use termion::raw::IntoRawMode;
+use repl::CommandHinter;
+use rustyline::{Editor, EventHandler, KeyEvent};
 
 use lexer::Lexer;
 use parser::{Parse, Parser};
 use postfix::PostfixParser;
 
+use crate::repl::{command_hints, TabEventHandler};
+
 mod lexer;
 mod parser;
 mod postfix;
+mod repl;
 
 enum OperationMode {
     Infix,
@@ -42,31 +42,18 @@ fn evaluate(
     }
 }
 
-fn get_line(mode: &OperationMode) -> String {
-    match mode {
-        OperationMode::Infix => {
-            print!("INFIX > ");
-        }
-        OperationMode::Postfix => {
-            print!("POSTFIX > ");
-        }
-    }
-
-    io::stdout().flush().unwrap();
-
-    let mut input = String::new();
-
-    match std::io::stdin().read_line(&mut input) {
-        Ok(_s) => {}
-        Err(_e) => {}
+fn get_line(editor: &mut Editor<CommandHinter>, mode: &OperationMode) -> rustyline::Result<String> {
+    let prompt = match mode {
+        OperationMode::Infix => "INFIX > ",
+        OperationMode::Postfix => "POSTFIX > ",
     };
 
-    input.trim().to_string()
+    let input = editor.readline(prompt)?;
+
+    Ok(input.trim().to_string())
 }
 
-fn run_repl(mode: OperationMode) -> Result<(), String> {
-    let mut memory: HashMap<String, String> = HashMap::new();
-
+fn run_repl(mode: OperationMode) -> rustyline::Result<()> {
     println!(
         "
 Hello and welcome! If you type in an expression according to this grammar
@@ -82,8 +69,24 @@ You can list all variables by typing `defined`.
             "
     );
 
+    let mut memory: HashMap<String, String> = HashMap::new();
+
+    let helper = CommandHinter {
+        hints: command_hints(),
+    };
+    let mut editor: Editor<CommandHinter> = Editor::new()?;
+
+    editor.set_helper(Some(helper));
+
+    editor.bind_sequence(
+        KeyEvent::from('\t'),
+        EventHandler::Conditional(Box::new(TabEventHandler)),
+    );
+
     loop {
-        let line = get_line(&mode);
+        let line = get_line(&mut editor, &mode)?;
+
+        editor.add_history_entry(line.as_str());
 
         if line == "exit" {
             return Ok(());
