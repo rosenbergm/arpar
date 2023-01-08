@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    collections::{linked_list::Iter, LinkedList},
-    iter::Peekable,
-};
+use std::collections::LinkedList;
 
 use crate::{
     lexer::{Lexer, Token},
