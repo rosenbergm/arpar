@@ -6,7 +6,7 @@ Můžeš použít jak infixovou, tak postfixovou notaci. Můžeš dokonce vytvá
 
 ## Jak spustit?
 
-Spusť program `scitatko` na svojí linuxové mašince nebo spusť příkazem `cargo run` (musíš mít ale nainstalovaný Rust, třeba na Archu stačí spustit jenom `paru -S rust`).
+Spusť program [`scitatko`](https://github.com/rosenbergm/arpar/releases/latest) na svojí linuxové mašince nebo spusť příkazem `cargo run` (musíš mít ale nainstalovaný Rust, třeba na Archu stačí spustit jenom `paru -S rust`).
 
 Normálně se spustí s infixovou notací. Pokud chceš psát s postfixovou notací, spusť `scitatko --postfix`.
 
