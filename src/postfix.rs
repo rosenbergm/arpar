@@ -1,25 +1,15 @@
 use std::collections::LinkedList;
 
 use crate::{
-    lexer::{Lexer, Token},
+    lexer::{Token, Tokens},
     parser::{Expression, Operator, Parse},
 };
 
-pub struct PostfixParser<'a> {
-    lexer: &'a Lexer,
-}
+pub struct PostfixParser;
 
-impl PostfixParser<'_> {
-    pub fn new(lexer: &Lexer) -> PostfixParser {
-        PostfixParser { lexer }
-    }
-}
-
-impl Parse for PostfixParser<'_> {
-    fn run(&self) -> Result<Expression, String> {
-        let tokens = self.lexer.run()?;
-
-        let mut tokens = tokens;
+impl Parse for PostfixParser {
+    fn run(tokens: &Tokens) -> Result<Expression, String> {
+        let mut tokens = tokens.clone();
 
         match tokens.pop_back() {
             None => Err("Unexpected error".to_string()),

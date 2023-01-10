@@ -1,24 +1,15 @@
 use std::{collections::linked_list::Iter, collections::HashMap, iter::Peekable};
 
-use crate::lexer::{Lexer, Token};
+use crate::lexer::{Lexer, Token, Tokens};
 
 pub trait Parse {
-    fn run(&self) -> Result<Expression, String>;
+    fn run(tokens: &Tokens) -> Result<Expression, String>;
 }
 
-pub struct Parser<'a> {
-    lexer: &'a Lexer,
-}
-impl Parser<'_> {
-    pub fn new(lexer: &Lexer) -> Parser {
-        Parser { lexer }
-    }
-}
+pub struct Parser;
 
-impl Parse for Parser<'_> {
-    fn run(&self) -> Result<Expression, String> {
-        let tokens = self.lexer.run()?;
-
+impl Parse for Parser {
+    fn run(tokens: &Tokens) -> Result<Expression, String> {
         let mut peekable_tokens = tokens.iter().peekable();
 
         parse_expression(&mut peekable_tokens)
@@ -113,13 +104,10 @@ impl Expression {
             Expression::Variable(var) => match memory.get(&var.to_string()) {
                 None => Err(format!("Variable {} not found.", var)),
                 Some(string_expr) => {
-                    let lexer = Lexer::new(string_expr.clone());
-                    let parser = Parser::new(&lexer);
+                    let tokens = Lexer::run(string_expr.clone())?;
+                    let expression = Parser::run(&tokens)?;
 
-                    match parser.run() {
-                        Ok(expression) => expression.evaluate(memory),
-                        Err(e) => Err(e),
-                    }
+                    expression.evaluate(memory)
                 }
             },
             Expression::Binary(Operator::Sum, left, right) => {

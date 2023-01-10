@@ -25,11 +25,11 @@ fn evaluate(
     line: String,
     memory: &HashMap<String, String>,
 ) -> Result<(), String> {
-    let lexer = Lexer::new(line);
+    let tokens = Lexer::run(line)?;
 
     let expression = match mode {
-        OperationMode::Infix => Parser::new(&lexer).run()?,
-        OperationMode::Postfix => PostfixParser::new(&lexer).run()?,
+        OperationMode::Infix => Parser::run(&tokens)?,
+        OperationMode::Postfix => PostfixParser::run(&tokens)?,
     };
 
     match expression.evaluate(memory) {

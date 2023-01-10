@@ -1,18 +1,14 @@
 use std::{collections::LinkedList, iter::Peekable};
 
-pub struct Lexer {
-    pub input: String,
-}
+pub type Tokens = LinkedList<Token>;
+
+pub struct Lexer;
 
 impl Lexer {
-    pub fn new(input: String) -> Lexer {
-        Lexer { input }
-    }
-
-    pub fn run(&self) -> Result<LinkedList<Token>, String> {
+    pub fn run(input: String) -> Result<Tokens, String> {
         let mut result: LinkedList<Token> = LinkedList::new();
 
-        let mut chars = self.input.chars().peekable();
+        let mut chars = input.chars().peekable();
 
         while let Some(&c) = chars.peek() {
             match c {
