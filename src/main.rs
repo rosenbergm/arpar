@@ -125,11 +125,16 @@ You can list all variables by typing `defined`.
                 continue;
             }
 
-            let variable_expr = split_line.get(1).unwrap().clone();
+            let variable_expr_str = split_line.get(1).unwrap().clone();
 
-            println!("Assignment: {} = {}", variable_name, variable_expr);
+            if variable_expr_str.contains(&variable_name) {
+                println!("Error: Forbidden recursion");
+                continue;
+            }
 
-            memory.insert(variable_name, variable_expr);
+            println!("Assignment: {} = {}", variable_name, variable_expr_str);
+
+            memory.insert(variable_name, variable_expr_str);
             continue;
         }
 
